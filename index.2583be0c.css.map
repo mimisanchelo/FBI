@@ -1,0 +1,1 @@
+{"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA","sources":["src/sass/style.css"],"sourcesContent":["* {\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n*,\r\n*::after,\r\n*::before {\r\n  box-sizing: border-box;\r\n}\r\n"],"names":[],"version":3,"file":"index.2583be0c.css.map","sourceRoot":"/__parcel_source_root/"}
