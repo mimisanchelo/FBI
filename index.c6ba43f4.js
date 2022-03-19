@@ -1014,7 +1014,7 @@ class SearchView extends _viewDefault.default {
         return this._data.map((d)=>{
             return `
           <li>
-            <a href='${d.path.slice(1)}#${d.uid}' class="preview__link" data-crime="${d.path}">
+            <a href='${d.uid}' class="preview__link" data-crime="${d.path}">
               <figure>
                 <img src="${d.images[0].large}" alt="fugitive"/>
               </figure>
