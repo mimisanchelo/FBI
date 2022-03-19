@@ -531,6 +531,7 @@ const controlProfile = async function() {
     try {
         //id
         const id = window.location.hash.slice(1);
+        console.log(id);
         if (!id) return;
         //spinner
         _profileViewDefault.default.renderSpinner();
@@ -581,6 +582,8 @@ parcelHelpers.export(exports, "loadSearchFugitiveNav", ()=>loadSearchFugitiveNav
 );
 var _config = require("./config");
 var _helper = require("./helper");
+const crimes = document.querySelectorAll('.crime').dataset;
+console.log(crimes);
 const state = {
     profile: {
     },
@@ -720,8 +723,8 @@ const loadSearchFugitive = async function(page = state.search.page) {
 };
 const loadSearchFugitiveNav = async function() {
     try {
-        const crimes = document.querySelectorAll('.crime');
-        crimes.forEach(function(c) {
+        const crimes1 = document.querySelectorAll('.crime');
+        crimes1.forEach(function(c) {
             c.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = e.target.closest('.crime').dataset;
@@ -1011,7 +1014,7 @@ class SearchView extends _viewDefault.default {
         return this._data.map((d)=>{
             return `
           <li>
-            <a href="${d.path.slice(0, this._data.lastIndexOf('/'))}#${d.uid}" class="preview__link" data-crime="${d.path}">
+            <a href='${d.path.slice(1)}#${d.uid}' class="preview__link" data-crime="${d.path}">
               <figure>
                 <img src="${d.images[0].large}" alt="fugitive"/>
               </figure>
@@ -1028,7 +1031,7 @@ class SearchView extends _viewDefault.default {
             return `
         
           <li>
-            <a href="#${d.uid}" class="preview__link">
+            <a href="/${d.path}" class="preview__link">
               <figure>
                 <img src="${d.images[0].large}" alt="fugitive"/>
               </figure>
