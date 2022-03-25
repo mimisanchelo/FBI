@@ -525,13 +525,14 @@ var _profileView = require("./views/profileView");
 var _profileViewDefault = parcelHelpers.interopDefault(_profileView);
 var _searchView = require("./views/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
+var _resultsView = require("./views/resultsView");
+var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
 var _paginationView = require("./views/paginationView");
 var _paginationViewDefault = parcelHelpers.interopDefault(_paginationView);
 const controlProfile = async function() {
     try {
         //id
         const id = window.location.hash.slice(1);
-        console.log(id);
         if (!id) return;
         //spinner
         _profileViewDefault.default.renderSpinner();
@@ -541,35 +542,37 @@ const controlProfile = async function() {
         _profileViewDefault.default.renderError();
     }
 };
-const searchResults = async function(page) {
+const searchResults = async function() {
     try {
-        _searchViewDefault.default.renderSpinner();
-        // const query = searchView.getQuery();
-        // if (!query) return;
-        // console.log(query);
-        await _model.loadSearchFugitive(page);
-        console.log(_model.state.search.result);
-        await _model.loadSearchFugitiveNav(_model.state.search.result);
-        //searchView.render(model.state.search.result);
-        _searchViewDefault.default.render(_model.state.search.result);
+        _resultsViewDefault.default.renderSpinner();
+        //search query
+        const query = _searchViewDefault.default.getQuery();
+        if (!query) return;
+        // load search
+        let _ = undefined;
+        await _model.loadSearchFugitive(query, _);
+        //render
+        _resultsViewDefault.default.render(_model.state.search.results);
         // render pagination
         _paginationViewDefault.default.render(_model.state);
     } catch (err) {
         console.log(`${err}`);
     }
 };
-// const controlPagination = function() {
-//     searchView.render(model.state.search.result);
-//     paginationView.render(model.state)
-// }
 const init = function() {
     _profileViewDefault.default.addHandlerRender(controlProfile);
     _searchViewDefault.default.addHandlerSearch(searchResults);
     _paginationViewDefault.default.addHandlerClick(searchResults);
 };
-init();
+init(); // const selectedCategory = document.querySelector('.select__category')
+ // selectedCategory.addEventListener('change', function() {
+ //   const titleCrime = document.querySelector('.most__wanted-title')
+ //   console.log(selectedCategory.value);
+ //   if(selectedCategory.value == 'Categories') return 
+ //   titleCrime.textContent = selectedCategory.value
+ // })
 
-},{"./model":"Y4A21","./views/profileView":"8Hi5l","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/paginationView":"6z7bi"}],"Y4A21":[function(require,module,exports) {
+},{"./model":"Y4A21","./views/profileView":"8Hi5l","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/paginationView":"6z7bi","./views/resultsView":"cSbZE"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state
@@ -578,17 +581,14 @@ parcelHelpers.export(exports, "loadFugitive", ()=>loadFugitive
 );
 parcelHelpers.export(exports, "loadSearchFugitive", ()=>loadSearchFugitive
 );
-parcelHelpers.export(exports, "loadSearchFugitiveNav", ()=>loadSearchFugitiveNav
-);
 var _config = require("./config");
 var _helper = require("./helper");
-const crimes = document.querySelectorAll('.crime').dataset;
-console.log(crimes);
 const state = {
     profile: {
     },
     search: {
-        result: [],
+        query: '',
+        results: [],
         resultsPerPage: _config.RES_PAGE,
         page: 1
     },
@@ -597,7 +597,6 @@ const state = {
 const loadFugitive = async function(id) {
     try {
         const data = await _helper.getJSON(`${_config.profileAPI}${id}`);
-        console.log(data);
         let profile = data;
         state.profile = {
             title: profile.title,
@@ -693,14 +692,15 @@ const loadFugitive = async function(id) {
         throw err;
     }
 };
-const loadSearchFugitive = async function(page = state.search.page) {
+const loadSearchFugitive = async function(query, page = state.search.page) {
     try {
-        const respond = await fetch(`https://api.fbi.gov/wanted/v1/list?page=${page}`);
+        state.search.query = query;
+        const respond = await fetch(`https://api.fbi.gov/@wanted?pageSize=${state.search.resultsPerPage}&page=${page}&sort_order=desc&field_offices=${query}`);
         const data = await respond.json();
-        console.log(data);
+        console.log(respond);
         const start = (page - 1) * state.search.resultsPerPage;
         const end = page * state.search.resultsPerPage;
-        state.search.result = data.items.map((rec)=>{
+        state.search.results = data.items.map((rec)=>{
             return {
                 title: rec.title,
                 uid: rec.uid,
@@ -712,49 +712,23 @@ const loadSearchFugitive = async function(page = state.search.page) {
                 audios: rec.audios,
                 additional: rec.additional,
                 submit: rec.submit,
-                stories: rec.stories
+                stories: rec.stories,
+                fieldOffice: rec.field_offices,
+                classification: rec.classification
             };
         });
-        state.total = data.total, state.search.page = data.page;
-        state.search.result.slice(start, end);
+        state.total = data.total;
+        state.search.page = data.page;
+        state.search.results.slice(start, end);
+        console.log(state);
     } catch (err) {
-        console.log(`${err}💥💥`);
+        throw err;
     }
-};
-const loadSearchFugitiveNav = async function() {
-    try {
-        const crimes1 = document.querySelectorAll('.crime');
-        crimes1.forEach(function(c) {
-            c.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = e.target.closest('.crime').dataset;
-                if (!target) return;
-                console.log(target);
-                document.querySelectorAll('.crime__link').href = target;
-            });
-        });
-        const respond = await fetch(`https://api.fbi.gov/wanted/v1/list`);
-        const data = await respond.json();
-        console.log(data);
-        state.search.result = data.items.map((rec)=>{
-            return {
-                title: rec.title,
-                uid: rec.uid,
-                path: rec.path,
-                images: rec.images,
-                aliases: rec.aliases,
-                url: rec.url,
-                subject: rec.subjects,
-                audios: rec.audios,
-                additional: rec.additional,
-                submit: rec.submit,
-                stories: rec.stories
-            };
-        });
-    } catch (err) {
-        console.log(`${err}💥💥💥`);
-    }
-};
+}; // export const getSearchResultsPage = function(page) {
+ //   const start = (page -1) * 20 //0
+ //   const end = page * 20 //9
+ //   return state.search.results.slice(start, end)
+ // }
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -834,6 +808,7 @@ var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
 class ProfileView extends _viewDefault.default {
     _errorMessage = `We could not find this profile.<br> Please try again!`;
+    _clearElements = document.querySelector('.field-wrapper');
     addHandlerRender(handler) {
         [
             "hashchange",
@@ -841,7 +816,12 @@ class ProfileView extends _viewDefault.default {
         ].forEach((ev)=>window.addEventListener(ev, handler)
         );
     }
+    _clearLeftovers() {
+        this._clearElements.innerHTML = ``;
+        document.querySelector('.most__wanted-p').textContent = ``;
+    }
     _generateMarkup() {
+        this._clearRubbish();
         return `
     <div class="fugitive__portfolio">
         <h1 class="fugitive__name">${this._data.title}</h1>
@@ -962,10 +942,11 @@ class View {
     _parentElement = document.querySelector(".fugitive__show");
     _data;
     render(data) {
+        if (!data || Array.isArray(data) && data.length === 0) return this.renderError();
         this._data = data;
         const markup = this._generateMarkup();
         this._clear();
-        this._parentElement.insertAdjacentHTML("beforeend", markup);
+        this._parentElement.insertAdjacentHTML("afterbegin", markup);
     }
     _clear() {
         this._parentElement.innerHTML = ``;
@@ -1000,38 +981,36 @@ parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
 class SearchView extends _viewDefault.default {
-    _parentElement = document.querySelector(".preview");
+    _parentElement = document.querySelector(".preview__header");
+    _parentFugitiveElement = document.querySelector('.preview');
+    getQuery() {
+        const query = this._parentElement.querySelector('.select__category-input').value;
+        this._clearInput();
+        let queryLow = query.split(' ').join('').toLowerCase();
+        return queryLow;
+    }
+    _clearInput() {
+        this._parentElement.querySelector('.select__category-input').value = ``;
+    }
+    _clear() {
+        this._parentFugitiveElement.innerHTML = ``;
+    }
     render(data) {
         this._data = data;
         const markup = this._generateMarkup();
-        this._clear();
-        this._parentElement.insertAdjacentHTML("beforeend", markup);
+        this._parentFugitiveElement.insertAdjacentHTML("beforeend", markup);
     }
     addHandlerSearch(handler) {
-        window.addEventListener("load", handler);
+        this._parentElement.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handler();
+        });
     }
     _generateMarkup() {
         return this._data.map((d)=>{
             return `
           <li>
-            <a href='${d.uid}' class="preview__link" data-crime="${d.path}">
-              <figure>
-                <img src="${d.images[0].large}" alt="fugitive"/>
-              </figure>
-              <div class="preview__data">
-                <h4 class="preview__title">${d.title}</h4>
-                <p class="preview__crime">${d.subject[0]}</p>
-              </div>
-            </a>
-          </li>`;
-        }).join("");
-    }
-    _generateMarkupNav() {
-        return this._data.map((d)=>{
-            return `
-        
-          <li>
-            <a href="/${d.path}" class="preview__link">
+            <a href="${d.path.slice(0, d.path.lastIndexOf('/'))}#${d.uid}" class="preview__link" data-crime="${d.path}">
               <figure>
                 <img src="${d.images[0].large}" alt="fugitive"/>
               </figure>
@@ -1044,7 +1023,7 @@ class SearchView extends _viewDefault.default {
         }).join("");
     }
 }
-exports.default = new SearchView(); //
+exports.default = new SearchView();
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./View":"5cUXS"}],"6z7bi":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1057,6 +1036,7 @@ class PaginationView extends _viewDefault.default {
     _generateMarkup() {
         const currentPage = this._data.search.page;
         const numPages = Math.ceil(this._data.total / this._data.search.resultsPerPage);
+        console.log(this._data.total, this._data.search.resultsPerPage, currentPage);
         // page 1 + other pages
         if (currentPage === 1 && numPages > 1) return ` <button data-goto='${currentPage + 1}' class="btn__next btn__page">
                       <span class="page">Page</span>
@@ -1094,6 +1074,35 @@ class PaginationView extends _viewDefault.default {
 }
 exports.default = new PaginationView();
 
-},{"./View":"5cUXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","remixicon/fonts/remixicon.css":"5hrvo"}],"5hrvo":[function() {},{}]},["7yNqf","bznnK"], "bznnK", "parcelRequire27e7")
+},{"./View":"5cUXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","remixicon/fonts/remixicon.css":"5hrvo"}],"5hrvo":[function() {},{}],"cSbZE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _viewJs = require("./View.js");
+var _viewJsDefault = parcelHelpers.interopDefault(_viewJs);
+class ResultsView extends _viewJsDefault.default {
+    _parentElement = document.querySelector('.preview');
+    _errorMessage = `No cases found! <br> Check your request out again!`;
+    _generateMarkup() {
+        return this._data.map(this._generateMarkupPreview).join("");
+    }
+    _generateMarkupPreview(result) {
+        return `
+    
+          <li>
+            <a href="${result.path.slice(0, result.path.lastIndexOf('/'))}#${result.uid}" class="preview__link" data-crime="${result.path}">
+              <figure>
+                <img src="${result.images[0].large}" alt="fugitive"/>
+              </figure>
+              <div class="preview__data">
+                <h4 class="preview__title">${result.title}</h4>
+                <p class="preview__crime">${result.subject[0]}</p>
+              </div>
+            </a>
+          </li>`;
+    }
+}
+exports.default = new ResultsView();
+
+},{"./View.js":"5cUXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7yNqf","bznnK"], "bznnK", "parcelRequire27e7")
 
 //# sourceMappingURL=index.c6ba43f4.js.map
