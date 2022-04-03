@@ -583,6 +583,7 @@ const controlPagination = async function(goToPage) {
 const init = function() {
     _profileViewDefault.default.addHandlerRender(controlProfile);
     _searchViewDefault.default.addHandlerSearch(searchResults);
+    _searchViewDefault.default.addHandlerSearchClick(searchResults);
     _paginationViewDefault.default.addHandlerClick(controlPagination);
 };
 init(); // const selectedCategory = document.querySelector('.select__category')
@@ -757,7 +758,6 @@ const loadSearchFugitive = async function(query) {
         });
         state.total = data.total;
         console.log(state);
-    //return window.location = `./field_offices=${state.search.query}`
     } catch (err) {
         throw err;
     }
@@ -1064,6 +1064,12 @@ class SearchView extends _viewDefault.default {
     }
     addHandlerSearch(handler) {
         this._parentElement.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handler();
+        });
+    }
+    addHandlerSearchClick(handler) {
+        document.querySelector('.btn__submit-filter').addEventListener('click', function(e) {
             e.preventDefault();
             handler();
         });
