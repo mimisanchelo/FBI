@@ -129,6 +129,13 @@ body {
   border-right: 1px solid black;
   grid-area: list;
 }
+@media only screen and (max-width: 800px) {
+  .search__results .search__results {
+    padding: 3rem 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
 .results {
   position: relative;
   list-style: none;
@@ -218,17 +225,6 @@ body {
     display: flex;
     flex-direction: column;
   }
-
-  .results {
-    margin: auto;
-    width: 100%;
-  }
-  .results a img {
-    display: block;
-    width: 125px;
-    height: 175px;
-    object-fit: contain;
-  }
 }
 .crime__nav {
   z-index: 5;
@@ -308,6 +304,11 @@ body {
   margin: 2rem auto 0;
   padding: 0 3rem 0 1rem;
   grid-area: fugitive;
+}
+@media only screen and (max-width: 800px) {
+  .fugitive__case .fugitive__case {
+    display: none;
+  }
 }
 .fugitive__case .message__error {
   display: flex;
@@ -485,11 +486,6 @@ body {
   }
   .fugitive__case .fugitive__top-field .fugitive__top-person img {
     width: 250px;
-  }
-}
-@media only screen and (max-width: 800px) {
-  .fugitive__case {
-    display: none;
   }
 }
 .btn {
