@@ -529,6 +529,9 @@ var _resultsView = require("./views/resultsView");
 var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
 var _paginationView = require("./views/paginationView");
 var _paginationViewDefault = parcelHelpers.interopDefault(_paginationView);
+// if(module.hot) {
+//   module.hot.accept()
+// }
 const controlProfile = async function() {
     try {
         //id
@@ -542,27 +545,46 @@ const controlProfile = async function() {
         _profileViewDefault.default.renderError();
     }
 };
+// const paginationC = function(goToPage) {
+//    model.state.search.page = goToPage
+//    return goToPage
+// }
 const searchResults = async function() {
     try {
         _resultsViewDefault.default.renderSpinner();
         //search query
         const query = _searchViewDefault.default.getQuery();
         if (!query) return;
-        // load search
-        let _ = undefined;
-        await _model.loadSearchFugitive(query, _);
+        // load search results
+        await _model.loadSearchFugitive(query);
         //render
-        _resultsViewDefault.default.render(_model.state.search.results);
-        // render pagination
+        _resultsViewDefault.default.render(_model.getSearchResultsPage());
+        // // render pagination
         _paginationViewDefault.default.render(_model.state);
     } catch (err) {
         console.log(`${err}`);
     }
 };
+const controlPagination = async function(goToPage) {
+    //render
+    _resultsViewDefault.default.render(_model.getSearchResultsPage(goToPage));
+    // // render pagination
+    _paginationViewDefault.default.render(_model.state);
+};
+// const controlFilter = async function() {
+//   try{
+//     let query = searchView.getCrimeQuery()
+//     console.log(query);
+//     searchView.render(model.state.search.results)
+//   } catch(err){
+//     console.log(`${err}`);
+//   }
+// }
 const init = function() {
     _profileViewDefault.default.addHandlerRender(controlProfile);
     _searchViewDefault.default.addHandlerSearch(searchResults);
-    _paginationViewDefault.default.addHandlerClick(searchResults);
+    //searchView.addHandlerSearch(controlFilter);
+    _paginationViewDefault.default.addHandlerClick(controlPagination);
 };
 init(); // const selectedCategory = document.querySelector('.select__category')
  // selectedCategory.addEventListener('change', function() {
@@ -580,6 +602,8 @@ parcelHelpers.export(exports, "state", ()=>state
 parcelHelpers.export(exports, "loadFugitive", ()=>loadFugitive
 );
 parcelHelpers.export(exports, "loadSearchFugitive", ()=>loadSearchFugitive
+);
+parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
 var _config = require("./config");
 var _helper = require("./helper");
@@ -681,7 +705,7 @@ const loadFugitive = async function(id) {
             ],
             warningM: profile.warning_message,
             rewardM: profile.reward_text,
-            cautions: profile.cautions,
+            cautions: profile.caution,
             remarks: profile.remarks,
             url: profile.url,
             subject: profile.subjects,
@@ -692,56 +716,130 @@ const loadFugitive = async function(id) {
         throw err;
     }
 };
-const loadSearchFugitive = async function(query, page = state.search.page) {
+const mobile = function() {
+    const btnCloseResults = document.querySelector('.results__close');
+    const fieldSearchResults = document.querySelector('.search__results');
+    const searchResults = document.querySelector('.results');
+    const fugitiveCase = document.querySelector('.fugitive__case');
+    if (window.screen.width <= 800) {
+        fieldSearchResults.style.display = 'none';
+        fugitiveCase.style.width = '100vw';
+    }
+};
+mobile();
+const loadSearchFugitive = async function(query) {
     try {
         state.search.query = query;
-        const respond = await fetch(`https://api.fbi.gov/@wanted?pageSize=${state.search.resultsPerPage}&page=${page}&sort_order=desc&field_offices=${query}`);
+        const respond = await fetch(`https://api.fbi.gov/wanted?pageSize=1000&sort_order=desc&field_offices=${query}`);
         const data = await respond.json();
-        console.log(respond);
-        const start = (page - 1) * state.search.resultsPerPage;
-        const end = page * state.search.resultsPerPage;
-        state.search.results = data.items.map((rec)=>{
+        console.log(data);
+        const results = document.querySelector('.results');
+        results.addEventListener('click', function(e) {
+            const btnCloseResults = document.querySelector('.results__close');
+            const fieldSearchResults = document.querySelector('.search__results');
+            const searchResults = document.querySelector('.results');
+            const result = document.querySelectorAll('.result');
+            const fugitiveCase = document.querySelector('.fugitive__case');
+            const targ = e.target.closest('.result');
+            console.log(targ);
+            result.forEach((res)=>{
+                res.classList.remove('active');
+            });
+            targ.classList.add('active');
+            if (window.innerWidth <= 800) {
+                fieldSearchResults.style.display = 'none';
+                fugitiveCase.style.width = '100vw';
+            }
+        });
+        state.search.results = data.items.map((item)=>{
             return {
-                title: rec.title,
-                uid: rec.uid,
-                path: rec.path,
-                images: rec.images,
-                aliases: rec.aliases,
-                url: rec.url,
-                subject: rec.subjects,
-                audios: rec.audios,
-                additional: rec.additional,
-                submit: rec.submit,
-                stories: rec.stories,
-                fieldOffice: rec.field_offices,
-                classification: rec.classification
+                title: item.title,
+                uid: item.uid,
+                path: item.path,
+                images: item.images,
+                aliases: item.aliases,
+                url: item.url,
+                subject: item.subjects,
+                audios: item.audios,
+                additional: item.additional,
+                submit: item.submit,
+                stories: item.stories,
+                fieldOffice: item.field_offices,
+                classification: item.classification
             };
         });
         state.total = data.total;
-        state.search.page = data.page;
-        state.search.results.slice(start, end);
         console.log(state);
     } catch (err) {
         throw err;
     }
-}; // export const getSearchResultsPage = function(page) {
- //   const start = (page -1) * 20 //0
- //   const end = page * 20 //9
- //   return state.search.results.slice(start, end)
- // }
+};
+// export const loadSearchFilter = async function () {
+//   try {
+//     const respond = await fetch(`https://api.fbi.gov/wanted`);
+//     const data = await respond.json();
+//     state.search.results = data.items.map((item) => {
+//       return {
+//         title: item.title,
+//         uid: item.uid,
+//         path: item.path,
+//         images: item.images,
+//         url: item.url,
+//         subject: item.subjects,
+//       };
+//     });
+//     state.total = data.total
+//     console.log(state);
+//   } catch (err) {
+//     throw err;
+//   }
+// };
+////////////////////////////////////////////
+const closeResults = function() {
+    const btnCloseResults = document.querySelector('.results__close');
+    const fieldSearchResults = document.querySelector('.search__results');
+    const searchResults = document.querySelector('.results');
+    const fugitiveCase = document.querySelector('.fugitive__case');
+    if (searchResults === ``) return;
+    btnCloseResults.addEventListener('click', function() {
+        console.log('clickedCLose');
+        fieldSearchResults.style.display = 'none';
+        fugitiveCase.style.width = '100vw';
+    });
+};
+closeResults();
+const getSearchResultsPage = function(page = state.search.page) {
+    state.search.page = page;
+    const start = (page - 1) * state.search.resultsPerPage;
+    const end = page * state.search.resultsPerPage;
+    return state.search.results.slice(start, end);
+} // export const getSearchSortData = function(sort = state.search.sort) {
+ //   sort.search.state =
+ //     const sort = document.getElementById('select-sort')
+ //     sort.addEventListener('change', function(e) {
+ //       e.preventDefault()
+ //       let sortData = sort.options[sort.selectedIndex].dataset.sort
+ //       console.log(sortData);
+ //       return sortData
+ //     })
+ //   }
+;
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "profileAPI", ()=>profileAPI
 );
+parcelHelpers.export(exports, "searchAPI", ()=>searchAPI
+);
 parcelHelpers.export(exports, "TIMEOUT_SEC", ()=>TIMEOUT_SEC
 );
 parcelHelpers.export(exports, "RES_PAGE", ()=>RES_PAGE
 );
 const profileAPI = "https://api.fbi.gov/@wanted-person/";
+const searchAPI = 'https://api.fbi.gov/wanted';
 const TIMEOUT_SEC = 10;
-const RES_PAGE = 20;
+const RES_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -807,8 +905,9 @@ parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
 class ProfileView extends _viewDefault.default {
-    _errorMessage = `We could not find this profile.<br> Please try again!`;
-    _clearElements = document.querySelector('.field-wrapper');
+    _errorMessage = `We could not find this profile. You always can review the current profile
+            
+  .<br> Please try again!`;
     addHandlerRender(handler) {
         [
             "hashchange",
@@ -816,14 +915,8 @@ class ProfileView extends _viewDefault.default {
         ].forEach((ev)=>window.addEventListener(ev, handler)
         );
     }
-    _clearLeftovers() {
-        this._clearElements.innerHTML = ``;
-        document.querySelector('.most__wanted-p').textContent = ``;
-    }
     _generateMarkup() {
-        this._clearRubbish();
         return `
-    <div class="fugitive__portfolio">
         <h1 class="fugitive__name">${this._data.title}</h1>
         <p class="fugitive__description">
           ${this._data.description}
@@ -842,7 +935,9 @@ class ProfileView extends _viewDefault.default {
              </p>
             
           </div>
-          <div class="fugitive__poster-download">
+          
+        </div>
+        <div class="fugitive__poster-download">
             <h3>Download Poster</h3>
             <ul>
             ${this._data.files.map((file)=>{
@@ -854,7 +949,6 @@ class ProfileView extends _viewDefault.default {
         }).join("")}
             </ul>
           </div>
-        </div>
         <div class="fugitive__photo-gallery">
           <ul>
           ${this._data.images.map((photo)=>{
@@ -881,15 +975,15 @@ class ProfileView extends _viewDefault.default {
           `;
         }).join("")}
         </table>`}
+
+        ${this._data.rewardM ? `<div class="fugitive__reward">
+          <h2>Reward:</h2>
+          <p><b>${this._data.rewardM}</b></p>
+        </div>` : ``}
         
         ${this._data.details ? `<div class="fugitive__details">
           <h2>Details:</h2>
           <p>${this._data.details}</p>
-        </div>` : ``}
-
-        ${this._data.rewardM ? `<div class="fugitive__reward">
-          <h2>Reward:</h2>
-          <p>${this._data.rewardM}</p>
         </div>` : ``}
 
         ${this._data.remarks ? `<div class="fugitive__remarks">
@@ -899,9 +993,7 @@ class ProfileView extends _viewDefault.default {
 
         ${this._data.cautions ? `<div class="fugitive__caution">
           <h2>Caution:</h2>
-          <p>
-            ${this._data.cautions}
-          </p>
+          <p>${this._data.cautions}</p>
         </div>` : ``}
 
         ${this._data.warningM ? `<div class="fugitive__warning-message">
@@ -914,7 +1006,13 @@ class ProfileView extends _viewDefault.default {
           </p>
           ${this._data.fieldOffice ? `<div class="fugitive__field-office">
             <p>Field Office:</p>
-            <span>${this._data.fieldOffice} </span>
+            ${this._data.fieldOffice.map((office)=>{
+            return `
+              <span class="field-office">
+                <a href='https://www.fbi.gov/contact-us/field-offices/${office}' target="_blank">${office} </a>
+              </span>
+              `;
+        }).join(",")}
           </div>
           ` : ``}
           
@@ -926,9 +1024,7 @@ class ProfileView extends _viewDefault.default {
           >
             Submit an anonymous Tip online
           </a>
-        </div>
-
-      </div>      
+        </div>    
     `;
     }
 }
@@ -939,7 +1035,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _remixiconCss = require("remixicon/fonts/remixicon.css");
 class View {
-    _parentElement = document.querySelector(".fugitive__show");
+    _parentElement = document.querySelector(".fugitive__case");
     _data;
     render(data) {
         if (!data || Array.isArray(data) && data.length === 0) return this.renderError();
@@ -981,46 +1077,28 @@ parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
 class SearchView extends _viewDefault.default {
-    _parentElement = document.querySelector(".preview__header");
-    _parentFugitiveElement = document.querySelector('.preview');
+    _parentEl = document.querySelector(".filter__crime");
+    _parentElement = document.querySelector(".filter__input");
+    getCrimeQuery() {
+        const selectedCrime = this._parentEl.querySelector('.crime__category');
+        this._parentEl.addEventListener('click', function() {
+            return selectedCrime.value;
+        });
+    }
     getQuery() {
-        const query = this._parentElement.querySelector('.select__category-input').value;
+        const query = this._parentElement.querySelector('.search__input').value;
+        let queryLow = query.split('').join('').toLowerCase();
         this._clearInput();
-        let queryLow = query.split(' ').join('').toLowerCase();
         return queryLow;
     }
     _clearInput() {
-        this._parentElement.querySelector('.select__category-input').value = ``;
-    }
-    _clear() {
-        this._parentFugitiveElement.innerHTML = ``;
-    }
-    render(data) {
-        this._data = data;
-        const markup = this._generateMarkup();
-        this._parentFugitiveElement.insertAdjacentHTML("beforeend", markup);
+        this._parentElement.querySelector('.search__input').value = ``;
     }
     addHandlerSearch(handler) {
         this._parentElement.addEventListener('submit', function(e) {
             e.preventDefault();
             handler();
         });
-    }
-    _generateMarkup() {
-        return this._data.map((d)=>{
-            return `
-          <li>
-            <a href="${d.path.slice(0, d.path.lastIndexOf('/'))}#${d.uid}" class="preview__link" data-crime="${d.path}">
-              <figure>
-                <img src="${d.images[0].large}" alt="fugitive"/>
-              </figure>
-              <div class="preview__data">
-                <h4 class="preview__title">${d.title}</h4>
-                <p class="preview__crime">${d.subject[0]}</p>
-              </div>
-            </a>
-          </li>`;
-        }).join("");
     }
 }
 exports.default = new SearchView();
@@ -1036,7 +1114,6 @@ class PaginationView extends _viewDefault.default {
     _generateMarkup() {
         const currentPage = this._data.search.page;
         const numPages = Math.ceil(this._data.total / this._data.search.resultsPerPage);
-        console.log(this._data.total, this._data.search.resultsPerPage, currentPage);
         // page 1 + other pages
         if (currentPage === 1 && numPages > 1) return ` <button data-goto='${currentPage + 1}' class="btn__next btn__page">
                       <span class="page">Page</span>
@@ -1044,13 +1121,13 @@ class PaginationView extends _viewDefault.default {
                       <i class="ri-arrow-right-line"></i>
                     </button>`;
         // last page
-        if (currentPage === numPages && numPages > 1) return `<button data-backto='${currentPage - 1}' class="btn__prev btn__page">
+        if (currentPage === numPages && numPages > 1) return `<button data-goto='${currentPage - 1}' class="btn__prev btn__page">
                       <i class="ri-arrow-left-line"></i>
                       <span class="page">Page</span>
                       <span class="page__number">${currentPage - 1}</span>
                     </button>`;
         // other pages
-        if (currentPage < numPages) return `<button data-backto='${currentPage - 1}' class="btn__prev btn__page">
+        if (currentPage < numPages) return `<button data-goto='${currentPage - 1}' class="btn__prev btn__page">
                      <i class="ri-arrow-left-line"></i>
                       <span class="page">Page</span>
                       <span class="page__number">${currentPage - 1}</span>
@@ -1061,7 +1138,7 @@ class PaginationView extends _viewDefault.default {
                       <i class="ri-arrow-right-line"></i>
                     </button>`;
         // page 1 + no pages
-        return ' 1 page';
+        return '';
     }
     addHandlerClick(handler) {
         this._parentElement.addEventListener('click', function(e) {
@@ -1080,16 +1157,15 @@ parcelHelpers.defineInteropFlag(exports);
 var _viewJs = require("./View.js");
 var _viewJsDefault = parcelHelpers.interopDefault(_viewJs);
 class ResultsView extends _viewJsDefault.default {
-    _parentElement = document.querySelector('.preview');
+    _parentElement = document.querySelector('.results');
     _errorMessage = `No cases found! <br> Check your request out again!`;
     _generateMarkup() {
         return this._data.map(this._generateMarkupPreview).join("");
     }
     _generateMarkupPreview(result) {
         return `
-    
-          <li>
-            <a href="${result.path.slice(0, result.path.lastIndexOf('/'))}#${result.uid}" class="preview__link" data-crime="${result.path}">
+          <li class="result" data-crime="${result.path.slice(8, result.path.lastIndexOf('/'))}">
+            <a href="#${result.uid}" class="preview__link">
               <figure>
                 <img src="${result.images[0].large}" alt="fugitive"/>
               </figure>

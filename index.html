@@ -26,59 +26,171 @@
             </div>
           </div>
           <ul class="brand__socials">
-            <a class="brand__link" href="https://www.google.com" target="_blank"><i class="fa-brands fa-facebook-square"></i></a>
-            <a class="brand__link" href="https://twitter.com/FBI" target="_blank"><i class="fa-brands fa-twitter-square"></i></a>
-            <a class="brand__link" href="https://www.youtube.com/user/fbi" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a class="brand__link" href="https://www.instagram.com/fbi/" target="_blank"><i class="fa-brands fa-instagram-square"></i></a>
+            <li>
+              <a class="brand__link" href="https://www.google.com" target="_blank"><i class="fa-brands fa-facebook-square"></i></a>
+          </li>
+            <li>
+              <a class="brand__link" href="https://twitter.com/FBI" target="_blank"><i class="fa-brands fa-twitter-square"></i></a>
+          </li>
+            <li>
+              <a class="brand__link" href="https://www.youtube.com/user/fbi" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            </li>
+            <li>
+                <a class="brand__link" href="https://www.instagram.com/fbi/" target="_blank"><i class="fa-brands fa-instagram-square"></i></a>
+            </li>
+            
           </ul>
         </div>
       </header>
-      <div class="preview__header">
+      <div class="filter__header">
         <div class="most__wanted">
           <a href="/index.html" class="most__wanted-title">Most Wanted</a>
-          <p class="most__wanted-p">Select the images of suspects to display more information.</p>
         </div>
-        <div class="field-wrapper">
-          <form action="">
-            <div class="filter__fields">
-              <label for="select__categories">Filter by:</label>
-                <select class="select__category" type="text" id="select-categories">
-                  <option value="Categories">Categories</option>
-                  <option value="Cyber`s Most Wanted">Cyber`s Most Wanted</option>
-                  <option value="White-Collar Crime">White-Collar Crime</option>
-                  <option value="Counterintelligence">Counterintelligence</option>
-                  <option value="Human Trafficking">Human Trafficking</option>
-                  <option value="Violent Crime">Violent Crime</option>
-                  <option value="Additional Violent Crimes">Additional Violent Crimes</option>
-                </select>
-                <span>and</span>
-              <label for="select__categories">Filter by:</label>
-                <input class="select__category-input" type="text" placeholder="Filter by title, description, category...">
+        <div class="filter__wrapper">
+          <div class="filter__fields">
+              <form class="filter__crime">
+                  <label for="select__category">Filter by:</label>
+                  <select class="select__category--input crime__category" type="text" id="select-categories">
+                      <option value="Categories">Categories</option>
+                      <option value="Cyber`s Most Wanted" data-crime="cyber">Cyber`s Most Wanted</option>
+                      <option value="White-Collar Crime" data-crime="wcc">White-Collar Crime</option>
+                      <option value="Counterintelligence" data-crime="counterintelligence">Counterintelligence</option>
+                      <option value="Human Trafficking" data-crime="trafficking">Human Trafficking</option>
+                      <option value="Violent Crime" data-crime="murders">Violent Crime</option>
+                      <option value="Additional Violent Crimes" data-crime="additional">Additional Violent Crimes</option>
+                  </select>
+                </form>
+              <form class="filter__input">
+                <label for="select__category">Filter by:</label>
+                <input class="select__category--input search__input" type="text" placeholder="Filter by field office">
                 
-              <label for="select__categories"><b>Sort by:</b></label>
-                <select class="select__sort" type="text" id="select-sort">
-                  <option value="Categories">Newest</option>
-                  <option value="Cyber`s Most Wanted">Created</option>
-                  <option value="White-Collar Crime">Modified</option>
+              </form> 
+              <form class="filter__sort">
+                <label for="select__category"><b>Sort by:</b></label>
+                <select class="select__category--input" type="text" id="select-sort">
+                  <option class="sort__data" value="Categories" data-sort="desc">Newest</option>
+                  <option class="sort__data" value="Cyber`s Most Wanted" data-sort="asc">Latest</option>
                 </select>
-              <button type="submit" class="btn btn__submit-filter">Filter</button>
-            </div>
-            <div class="sort__data">
+              </form>
               
-            </div>
-          </form>
+              <button type="submit" class="btn btn__submit-filter">Filter</button>
+              <button class="results__close">close</button>
+              
+          </div>  
         </div>
       </div>
-      <div class="fugitive__show">
-              <div class="search__results">
-                <ul class="preview">      
-                </ul>
-                  <div class="pagination"></div>
-              </div>
-                
-              
-             <div class="fugitive__port"></div>
+      <div class="search__results">
+          <ul class="results">
+            
+          </ul>
+          <div class="pagination">
+            <!-- <button data-backto='${currentPage - 1}' class="pagination__btn--prev btn__page">
+              <i class="ri-arrow-left-line"></i>
+              <span class="page">Page</span>
+              <span class="page__number">1</span>
+            </button>
+            <button data-goto='${currentPage + 1}' class="pagination__btn--next btn__page">
+              <span class="page">Page</span>
+              <span class="page__number">3</span>
+              <i class="ri-arrow-right-line"></i>
+            </button> -->
+          </div>
       </div> 
+      <div class="fugitive__case">
+        <!-- <div>
+    <button class="show--results">Results</button>
+    </div> -->
+        <div class="message">
+          <p class="message__text">Select the images of suspects to display more information.</p>
+        </div>
+        <!-- <h1 class="fugitive__name">${this._data.title}</h1>
+        <p class="fugitive__description">
+          ${this._data.description}
+        </p>
+
+        <div class="fugitive__top-field">
+          <div class="fugitive__top-person">
+            <img src="/src/img/fugitive2.jpg" alt="" />
+          </div>
+          <div class="fugitive__top-poster">
+            <a href='#' target="_blank">
+              <img src='#/@@screenshot.gif'>
+            </a>
+            <p>
+             <a href='#' target="_blank">View Poster</a>
+             </p>
+            
+          </div>
+          <div class="fugitive__poster-download">
+            <h3>Download Poster</h3>
+            <ul>
+              <li>
+                <a href="#" target="_blank">name</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="fugitive__photo-gallery">
+          <ul>
+                <li>
+                  <img src="./src/img/fugitive2.jpg" alt="" />
+                </li>
+          </ul>
+        </div>
+        <span class="straight__line"></span>
+
+        <h2 class="fugitive__aliases">Aliases:</h2>
+        <p class="fugitive__aliases-names">kosta</p>
+        <table>
+          <tr>
+            <td>hair</td>
+            <td>  wq</td>
+          </tr>
+        </table>
+        
+        <div class="fugitive__details">
+          <h2>Details:</h2>
+          <p>${this._data.details}</p>
+        </div>
+
+        <div class="fugitive__reward">
+          <h2>Reward:</h2>
+          <p>${this._data.rewardM}</p>
+        </div>
+
+        <div class="fugitive__remarks">
+          <h2>Remarks: </h2>
+          <p>${this._data.remarks}</p>
+        </div>
+
+        <div class="fugitive__caution">
+          <h2>Caution:</h2>
+          <p>
+            ${this._data.cautions}
+          </p>
+        </div>
+
+        <div class="fugitive__warning-message">
+          <p>${this._data.warningM}</p>
+        </div>
+        
+        <div class="fugitive__tips">
+          <p>
+            <b>Anyone with information is requested to call the Tip Line or submit tips online. All information will be taken and followed up on by investigators. Callers can remain anonymous.</b>
+          </p>
+          ${this._data.fieldOffice ? `<div class="fugitive__field-office">
+            <p>Field Office:</p>
+            <span>${this._data.fieldOffice} </span>
+          </div>
+          <a
+            class="fugitive__tips-link"
+            href="https://tips.fbi.gov/"
+            target="_blank"
+          >
+            Submit an anonymous Tip online
+          </a>
+        </div> -->
+      </div>
     </main>
   </body>
 </html>
