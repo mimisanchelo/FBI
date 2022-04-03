@@ -735,6 +735,7 @@ const loadSearchFugitive = async function(query) {
             if (window.innerWidth <= 800) {
                 fieldSearchResults.style.display = 'none';
                 fugitiveCase.style.width = '100vw';
+                fugitiveCase.style.display = 'block';
             }
         });
         state.search.results = data.items.map((item)=>{

@@ -223,6 +223,12 @@ body {
     margin: auto;
     width: 100%;
   }
+  .results a img {
+    display: block;
+    width: 125px;
+    height: 175px;
+    object-fit: contain;
+  }
 }
 .crime__nav {
   z-index: 5;
