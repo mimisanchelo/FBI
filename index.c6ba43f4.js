@@ -583,7 +583,6 @@ const controlPagination = async function(goToPage) {
 const init = function() {
     _profileViewDefault.default.addHandlerRender(controlProfile);
     _searchViewDefault.default.addHandlerSearch(searchResults);
-    //searchView.addHandlerSearch(controlFilter);
     _paginationViewDefault.default.addHandlerClick(controlPagination);
 };
 init(); // const selectedCategory = document.querySelector('.select__category')
@@ -628,7 +627,7 @@ const loadFugitive = async function(id) {
             description: profile.description,
             details: profile.details,
             suspects: profile.suspects,
-            path: profile.path,
+            path: profile.path.slice(1, profile.path.lastIndexOf('/')),
             images: profile.images,
             files: profile.files,
             aliases: profile.aliases,
@@ -716,17 +715,6 @@ const loadFugitive = async function(id) {
         throw err;
     }
 };
-const mobile = function() {
-    const btnCloseResults = document.querySelector('.results__close');
-    const fieldSearchResults = document.querySelector('.search__results');
-    const searchResults = document.querySelector('.results');
-    const fugitiveCase = document.querySelector('.fugitive__case');
-    if (window.screen.width <= 800) {
-        fieldSearchResults.style.display = 'none';
-        fugitiveCase.style.width = '100vw';
-    }
-};
-mobile();
 const loadSearchFugitive = async function(query) {
     try {
         state.search.query = query;
@@ -735,9 +723,7 @@ const loadSearchFugitive = async function(query) {
         console.log(data);
         const results = document.querySelector('.results');
         results.addEventListener('click', function(e) {
-            const btnCloseResults = document.querySelector('.results__close');
             const fieldSearchResults = document.querySelector('.search__results');
-            const searchResults = document.querySelector('.results');
             const result = document.querySelectorAll('.result');
             const fugitiveCase = document.querySelector('.fugitive__case');
             const targ = e.target.closest('.result');
@@ -770,30 +756,11 @@ const loadSearchFugitive = async function(query) {
         });
         state.total = data.total;
         console.log(state);
+    //return window.location = `./field_offices=${state.search.query}`
     } catch (err) {
         throw err;
     }
 };
-// export const loadSearchFilter = async function () {
-//   try {
-//     const respond = await fetch(`https://api.fbi.gov/wanted`);
-//     const data = await respond.json();
-//     state.search.results = data.items.map((item) => {
-//       return {
-//         title: item.title,
-//         uid: item.uid,
-//         path: item.path,
-//         images: item.images,
-//         url: item.url,
-//         subject: item.subjects,
-//       };
-//     });
-//     state.total = data.total
-//     console.log(state);
-//   } catch (err) {
-//     throw err;
-//   }
-// };
 ////////////////////////////////////////////
 const closeResults = function() {
     const btnCloseResults = document.querySelector('.results__close');
@@ -1167,7 +1134,7 @@ class ResultsView extends _viewJsDefault.default {
           <li class="result" data-crime="${result.path.slice(8, result.path.lastIndexOf('/'))}">
             <a href="#${result.uid}" class="preview__link">
               <figure>
-                <img src="${result.images[0].large}" alt="fugitive"/>
+                <img src="${result.images[0].large}" alt="${result.title}"/>
               </figure>
               <div class="preview__data">
                 <h4 class="preview__title">${result.title}</h4>

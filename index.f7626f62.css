@@ -116,6 +116,12 @@ body {
   grid-template-columns: 1fr 2fr;
   grid-template-areas: "head head" "searchForm searchForm" "list fugitive";
 }
+@media only screen and (max-width: 800px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+}
 .search__results {
   padding: 2rem 0;
   display: flex;
@@ -214,11 +220,8 @@ body {
   }
 
   .results {
-    list-style: none;
-    margin-bottom: 1rem;
-  }
-  .results li.active {
-    background-color: #b1fafa;
+    margin: auto;
+    width: 100%;
   }
 }
 .crime__nav {
@@ -476,6 +479,11 @@ body {
   }
   .fugitive__case .fugitive__top-field .fugitive__top-person img {
     width: 250px;
+  }
+}
+@media only screen and (max-width: 800px) {
+  .fugitive__case {
+    display: none;
   }
 }
 .btn {
