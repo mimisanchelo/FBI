@@ -105,9 +105,10 @@ html {
 }
 body {
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.5;
   background-size: cover;
   background-repeat: no-repeat;
+  color: #333;
   font-family: "David Libre", serif;
 }
 .container {
@@ -128,18 +129,20 @@ body {
   flex-direction: column;
   border-right: 1px solid black;
   grid-area: list;
-}
-@media only screen and (max-width: 800px) {
-  .search__results .search__results {
-    padding: 3rem 0;
-    display: flex;
-    flex-direction: column;
-  }
+  height: 100%;
 }
 .results {
   position: relative;
   list-style: none;
   margin-bottom: 1rem;
+}
+.results .message {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 0 1rem;
 }
 .results li.active {
   background-color: #b1fafa;
@@ -221,9 +224,36 @@ body {
 }
 @media only screen and (max-width: 800px) {
   .search__results {
-    padding: 3rem 0;
-    display: flex;
-    flex-direction: column;
+    border-right: none;
+  }
+  .search__results.hidden {
+    display: none;
+  }
+
+  .results {
+    width: 100%;
+  }
+  .results a {
+    width: 100vw;
+    padding: 0.5rem 1rem;
+  }
+  .results a .preview__data {
+    margin-left: 0.5rem;
+    padding: 1rem 0;
+  }
+  .results a .preview__data .preview__title {
+    font-size: 18px;
+  }
+  .results a .preview__data .preview__crime {
+    font-size: 16px;
+  }
+  .results a:hover {
+    background-color: antiquewhite;
+    transform: translateY(-2px);
+  }
+  .results a img {
+    width: 125px;
+    height: 175px;
   }
 }
 .crime__nav {
@@ -305,10 +335,11 @@ body {
   padding: 0 3rem 0 1rem;
   grid-area: fugitive;
 }
-@media only screen and (max-width: 800px) {
-  .fugitive__case .fugitive__case {
-    display: none;
-  }
+.fugitive__case .message {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  font-size: 1.5rem;
 }
 .fugitive__case .message__error {
   display: flex;
@@ -488,16 +519,23 @@ body {
     width: 250px;
   }
 }
+@media only screen and (max-width: 800px) {
+  .fugitive__case.hidden {
+    display: none;
+  }
+}
 .btn {
   border: none;
   cursor: pointer;
   align-items: center;
   transition: all 0.2s;
-  padding: 0.5rem 1rem;
-  font-size: 1.5rem;
+  border-radius: 4px;
 }
 .btn:hover {
   transform: scale(1.03);
+}
+.btn:active {
+  transform: scale(0.98);
 }
 .btn:focus {
   outline: none;
@@ -584,6 +622,9 @@ body {
   text-align: center;
 }
 .filter__wrapper .filter__fields {
+  background-color: #f3f3f3;
+  padding: 0.8em;
+  margin-bottom: 1rem;
   display: flex;
 }
 .filter__wrapper .filter__fields .filter__crime, .filter__wrapper .filter__fields .filter__input, .filter__wrapper .filter__fields .filter__sort {
@@ -595,6 +636,18 @@ body {
 }
 .filter__wrapper .filter__fields span {
   padding: 1rem 0.5rem 0 0;
+}
+.filter__wrapper .filter__fields .btn__submit-filter {
+  background-color: #003980;
+  color: white;
+  padding: 8px 22px;
+}
+.results__close {
+  display: none;
+  margin: auto;
+  padding: 8px 22px;
+  background-color: #003980;
+  color: white;
 }
 @media only screen and (max-width: 1050px) {
   .most__wanted a {

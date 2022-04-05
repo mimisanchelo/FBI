@@ -73,15 +73,21 @@
                 </select>
               </form>
               
-              <button type="submit" class="btn btn__submit-filter">Filter</button>
-              <button class="results__close">close</button>
+              <button type="button" class="btn btn__submit-filter">Filter</button>
+              
               
           </div>  
         </div>
+        <div>
+          <button class="btn results__close">Back to Search</button>
+        </div>
       </div>
       <div class="search__results">
+          
           <ul class="results">
-            
+            <div class="message">
+              <p class="message__text">In order to display portfolios filter it by crime or field office.</p>
+            </div>
           </ul>
           <div class="pagination">
             <!-- <button data-backto='${currentPage - 1}' class="pagination__btn--prev btn__page">
@@ -96,7 +102,7 @@
             </button> -->
           </div>
       </div> 
-      <div class="fugitive__case">
+      <div class="fugitive__case hidden">
         <!-- <div>
     <button class="show--results">Results</button>
     </div> -->

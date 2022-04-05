@@ -545,10 +545,6 @@ const controlProfile = async function() {
         _profileViewDefault.default.renderError();
     }
 };
-// const paginationC = function(goToPage) {
-//    model.state.search.page = goToPage
-//    return goToPage
-// }
 const searchResults = async function() {
     try {
         _resultsViewDefault.default.renderSpinner();
@@ -571,28 +567,13 @@ const controlPagination = async function(goToPage) {
     // // render pagination
     _paginationViewDefault.default.render(_model.state);
 };
-// const controlFilter = async function() {
-//   try{
-//     let query = searchView.getCrimeQuery()
-//     console.log(query);
-//     searchView.render(model.state.search.results)
-//   } catch(err){
-//     console.log(`${err}`);
-//   }
-// }
 const init = function() {
     _profileViewDefault.default.addHandlerRender(controlProfile);
     _searchViewDefault.default.addHandlerSearch(searchResults);
     _searchViewDefault.default.addHandlerSearchClick(searchResults);
     _paginationViewDefault.default.addHandlerClick(controlPagination);
 };
-init(); // const selectedCategory = document.querySelector('.select__category')
- // selectedCategory.addEventListener('change', function() {
- //   const titleCrime = document.querySelector('.most__wanted-title')
- //   console.log(selectedCategory.value);
- //   if(selectedCategory.value == 'Categories') return 
- //   titleCrime.textContent = selectedCategory.value
- // })
+init();
 
 },{"./model":"Y4A21","./views/profileView":"8Hi5l","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/paginationView":"6z7bi","./views/resultsView":"cSbZE"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -723,6 +704,15 @@ const loadSearchFugitive = async function(query) {
         const data = await respond.json();
         console.log(data);
         const results = document.querySelector('.results');
+        const btnCloseResults = document.querySelector('.results__close');
+        const fieldSearchResults1 = document.querySelector('.search__results');
+        const result1 = document.querySelectorAll('.result');
+        const fugitiveCase1 = document.querySelector('.fugitive__case');
+        btnCloseResults.addEventListener('click', function() {
+            fugitiveCase1.classList.add('hidden');
+            fieldSearchResults1.classList.remove('hidden');
+            btnCloseResults.style.display = 'none';
+        });
         results.addEventListener('click', function(e) {
             const fieldSearchResults = document.querySelector('.search__results');
             const result = document.querySelectorAll('.result');
@@ -731,13 +721,13 @@ const loadSearchFugitive = async function(query) {
             console.log(targ);
             result.forEach((res)=>{
                 res.classList.remove('active');
+                if (window.innerWidth <= 800) {
+                    fugitiveCase.classList.remove('hidden');
+                    fieldSearchResults.classList.add('hidden');
+                    btnCloseResults.style.display = 'block';
+                }
             });
             targ.classList.add('active');
-            if (window.innerWidth <= 800) {
-                fieldSearchResults.style.display = 'none';
-                fugitiveCase.style.width = '100vw';
-                fugitiveCase.style.display = 'block';
-            }
         });
         state.search.results = data.items.map((item)=>{
             return {
@@ -762,36 +752,12 @@ const loadSearchFugitive = async function(query) {
         throw err;
     }
 };
-////////////////////////////////////////////
-const closeResults = function() {
-    const btnCloseResults = document.querySelector('.results__close');
-    const fieldSearchResults = document.querySelector('.search__results');
-    const searchResults = document.querySelector('.results');
-    const fugitiveCase = document.querySelector('.fugitive__case');
-    if (searchResults === ``) return;
-    btnCloseResults.addEventListener('click', function() {
-        console.log('clickedCLose');
-        fieldSearchResults.style.display = 'none';
-        fugitiveCase.style.width = '100vw';
-    });
-};
-closeResults();
 const getSearchResultsPage = function(page = state.search.page) {
     state.search.page = page;
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
     return state.search.results.slice(start, end);
-} // export const getSearchSortData = function(sort = state.search.sort) {
- //   sort.search.state =
- //     const sort = document.getElementById('select-sort')
- //     sort.addEventListener('change', function(e) {
- //       e.preventDefault()
- //       let sortData = sort.options[sort.selectedIndex].dataset.sort
- //       console.log(sortData);
- //       return sortData
- //     })
- //   }
-;
+};
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
